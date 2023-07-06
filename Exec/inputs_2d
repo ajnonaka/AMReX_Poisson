@@ -1,2 +1,12 @@
+n_cell_x = 64
+n_cell_y = 64
+
+prob_lo_x = -1.
+prob_lo_y = -1.
+
+prob_hi_x = 1.
+prob_hi_y = 1.
+
+max_grid_size = 32
 n_cell = 64
 max_grid_size = 32

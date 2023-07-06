@@ -26,8 +26,21 @@ void main_main ()
     // What time is it now?  We'll use this to compute total run time.
     auto strt_time = amrex::second();
 
-    // AMREX_SPACEDIM: number of dimensions
-    int n_cell, max_grid_size;
+    // number of cells on each side of the domain
+    int n_cell_x = 64;
+    int n_cell_y = 64;
+    int n_cell_z = 64;
+
+    // dimensions of each box (or grid)
+    Real prob_lo_x = 0.;
+    Real prob_lo_y = 0.;
+    Real prob_lo_z = 0.;
+    Real prob_hi_x = 1.;
+    Real prob_hi_y = 1.;
+    Real prob_hi_z = 1.;
+
+    // This is the largest size a grid can be
+    int max_grid_size = 32;
 
     // inputs parameters
     {
@@ -36,10 +49,22 @@ void main_main ()
 
         // We need to get n_cell from the inputs file - this is the number of cells on each side of
         //   a square (or cubic) domain.
-        pp.get("n_cell",n_cell);
+        pp.query("n_cell_x",n_cell_x);
+        pp.query("n_cell_y",n_cell_y);
+        pp.query("n_cell_z",n_cell_z);
+
+        // We need to query prob_lo_x/y/z from the inputs file - tlos is the physical dimensions of the domain
+        pp.query("prob_lo_x",prob_lo_x);
+        pp.query("prob_lo_y",prob_lo_y);
+        pp.query("prob_lo_z",prob_lo_z);
+
+        // We need to query prob_hi_x/y/z from the inputs file - this is the physical dimensions of the domain
+        pp.query("prob_hi_x",prob_hi_x);
+        pp.query("prob_hi_y",prob_hi_y);
+        pp.query("prob_hi_z",prob_hi_z);
 
         // The domain is broken into boxes of size max_grid_size
-        pp.get("max_grid_size",max_grid_size);
+        pp.query("max_grid_size",max_grid_size);
     }
 
     // assume periodic in all directions
@@ -49,8 +74,8 @@ void main_main ()
     BoxArray ba;
     Geometry geom;
     {
-        IntVect dom_lo(AMREX_D_DECL(       0,        0,        0));
-        IntVect dom_hi(AMREX_D_DECL(n_cell-1, n_cell-1, n_cell-1));
+        IntVect dom_lo(AMREX_D_DECL(         0,          0,          0));
+        IntVect dom_hi(AMREX_D_DECL(n_cell_x-1, n_cell_y-1, n_cell_z-1));
         Box domain(dom_lo, dom_hi);
 
         // Initialize the boxarray "ba" from the single box "bx"
@@ -59,8 +84,8 @@ void main_main ()
         ba.maxSize(max_grid_size);
 
        // This defines the physical box, [-1,1] in each direction.
-        RealBox real_box({AMREX_D_DECL(-1.0,-1.0,-1.0)},
-                         {AMREX_D_DECL( 1.0, 1.0, 1.0)});
+        RealBox real_box({AMREX_D_DECL(prob_lo_x,prob_lo_y,prob_lo_z)},
+                         {AMREX_D_DECL(prob_hi_x,prob_hi_y,prob_hi_z)});
 
         // This defines a Geometry object
         geom.define(domain,&real_box,CoordSys::cartesian,is_periodic.data());
