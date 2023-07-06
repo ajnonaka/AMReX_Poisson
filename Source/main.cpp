@@ -83,7 +83,7 @@ void main_main ()
         // Break up boxarray "ba" into chunks no larger than "max_grid_size" along a direction
         ba.maxSize(max_grid_size);
 
-       // This defines the physical box, [-1,1] in each direction.
+       // This defines the physical box in each direction.
         RealBox real_box({AMREX_D_DECL(prob_lo_x,prob_lo_y,prob_lo_z)},
                          {AMREX_D_DECL(prob_hi_x,prob_hi_y,prob_hi_z)});
 
@@ -116,11 +116,9 @@ void main_main ()
         auto const& rhs_ptr = rhs.array(mfi);
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k)
         {
-            // FIXME - replace -1.0 with prob_lo[0] and prob_lo[1]
-            Real x = -1.0 + (i+0.5)*dx[0];
-            Real y = -1.0 + (j+0.5)*dx[1];
-
-            Real z = (AMREX_SPACEDIM == 3) ? -1.0 + (k+0.5)*dx[2] : 0.;
+            Real x = prob_lo_x + (i+0.5)*dx[0];
+            Real y = prob_lo_y + (j+0.5)*dx[1];
+            Real z = (AMREX_SPACEDIM == 3) ? prob_lo_z + (k+0.5)*dx[2] : 0.;
             
             rhs_ptr(i,j,k) = std::exp(-10.*(x*x+y*y+z*z));
         });
