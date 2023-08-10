@@ -117,7 +117,7 @@ void main_main ()
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k)
         {
             Real x = prob_lo_x + (i+0.5) * dx[0];
-            Real y = (AMREX_SPACEDIM==2) ? prob_lo_y + (j+0.5) * dx[1] : 0.;
+            Real y = (AMREX_SPACEDIM>=2) ? prob_lo_y + (j+0.5) * dx[1] : 0.;
             Real z = (AMREX_SPACEDIM==3) ? prob_lo_z + (k+0.5) * dx[2] : 0.;
             
             rhs_ptr(i,j,k) = std::exp(-10.*((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5)+(z-0.5)*(z-0.5)));
